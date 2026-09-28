@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Tabela de preços e simulador São Paulo Mecânica">
+  <title>São Paulo Mecânica — Tabela de Preços</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800&family=Rajdhani:wght@500;600;700&display=swap');
+
+:root{
+  --bg:#06080d;
+  --panel:#0d111b;
+  --panel2:#111622;
+  --line:#1d2635;
+  --text:#edf1f8;
+  --muted:#78849a;
+  --cyan:#20d9ff;
+  --orange:#ff9b25;
+  --pink:#ee56bd;
+  --green:#5ef28a;
+  --gold:#ffc928;
+  --red:#ff6666;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  color:var(--text);
+  background:
+    linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px),
+    radial-gradient(circle at 50% -10%,#172033 0,transparent 48%),
+    var(--bg);
+  background-size:28px 28px,28px 28px,100% 100%,auto;
+  font-family:Rajdhani,Arial,sans-serif;
+}
+
+button{font:inherit}
+.page{width:min(1470px,calc(100% - 32px));margin:auto;padding:18px 0 45px}
+
+.topbar{
+  min-height:116px;
+  border:1px solid #202a3b;
+  border-radius:15px;
+  background:linear-gradient(145deg,#111621,#090c13);
+  display:grid;
+  grid-template-columns:230px 1fr 180px;
+  align-items:center;
+  gap:20px;
+  padding:18px 24px;
+  box-shadow:0 20px 50px rgba(0,0,0,.22);
+}
+
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{
+  width:74px;height:54px;border:2px solid #ff394e;border-radius:8px;
+  display:grid;place-items:center;font:800 18px Orbitron;letter-spacing:-1px;
+  box-shadow:inset 0 0 16px rgba(255,40,65,.08);
+}
+.brand-mark span{color:#ff394e}
+.brand strong{display:block;font:800 16px Orbitron;letter-spacing:1px}
+.brand small{color:#ff394e;font-weight:800;letter-spacing:3px}
+.title{text-align:center}
+.title h1{margin:0;font:800 clamp(28px,4vw,47px) Orbitron;letter-spacing:1px}
+.title h1 span{color:var(--cyan);text-shadow:0 0 20px rgba(32,217,255,.3)}
+.title p{margin:5px 0 0;color:#7c8aa0;font:600 11px Orbitron;letter-spacing:4px}
+.side-brand{text-align:right;color:#ffd94c;font:800 20px Orbitron;line-height:1.05}
+.side-brand small{font-size:9px;letter-spacing:4px;color:#7f8798}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:20px;
+  margin-top:22px;
+}
+
+.card{
+  min-width:0;
+  border:1px solid #222c3c;
+  border-radius:14px;
+  background:linear-gradient(180deg,#111622,#0a0e16);
+  padding:20px 14px 18px;
+  overflow:hidden;
+}
+
+.card-title{text-align:center;margin-bottom:18px}
+.card-title h2{margin:0;font:800 29px Orbitron;letter-spacing:2px}
+.card-title p{margin:5px 0 0;color:#78849a;font:600 10px Orbitron;letter-spacing:3px}
+
+.card.cyan .card-title h2{color:var(--cyan);text-shadow:0 0 15px rgba(32,217,255,.3)}
+.card.orange .card-title h2{color:var(--orange);text-shadow:0 0 15px rgba(255,155,37,.25)}
+.card.pink .card-title h2{color:var(--pink);text-shadow:0 0 15px rgba(238,86,189,.25)}
+.card.green .card-title h2{color:var(--green);text-shadow:0 0 15px rgba(94,242,138,.25)}
+
+.item{
+  display:grid;
+  grid-template-columns:38px 1fr auto 24px;
+  align-items:center;
+  gap:8px;
+  min-height:52px;
+  padding:7px 8px;
+  margin:8px 0;
+  border-radius:11px;
+  background:#121721;
+  transition:.15s;
+}
+.item:hover{background:#171d29;transform:translateY(-1px)}
+.icon{
+  width:32px;height:32px;border:1px solid currentColor;border-radius:9px;
+  display:grid;place-items:center;font-size:15px;opacity:.9
+}
+.cyan .icon,.cyan .price{color:var(--cyan)}
+.orange .icon,.orange .price{color:var(--orange)}
+.pink .icon,.pink .price{color:#b65aff}
+.green .icon,.green .price{color:var(--green)}
+
+.name{font:700 12px Orbitron;line-height:1.15}
+.price{font:800 14px Orbitron;white-space:nowrap}
+
+.check{
+  width:22px;height:22px;border:1px solid #36404f;border-radius:7px;
+  background:#080b10;cursor:pointer;position:relative;
+}
+.check.selected{background:currentColor;border-color:currentColor}
+.check.selected::after{
+  content:"✓";position:absolute;inset:0;display:grid;place-items:center;
+  color:#071016;font-weight:900;
+}
+
+.section-label{
+  text-align:center;color:#7d899e;font:600 10px Orbitron;letter-spacing:3px;
+  margin:17px 0 8px;
+}
+
+.counter{
+  display:grid;grid-template-columns:32px 1fr 32px;align-items:center;gap:8px;
+}
+.counter button{
+  height:34px;border:1px solid currentColor;border-radius:8px;background:transparent;
+  color:inherit;cursor:pointer;font-size:19px;
+}
+.counter .qty{
+  text-align:center;color:var(--muted);font-weight:800;
+}
+
+.premium{
+  margin-top:22px;border:1px solid #e2af18;border-radius:15px;
+  background:linear-gradient(110deg,#171305,#0d0c08 55%,#130f06);
+  padding:24px 28px;
+  box-shadow:0 0 45px rgba(255,190,30,.08);
+}
+.premium-head{
+  display:grid;grid-template-columns:62px 1fr auto 24px;align-items:center;gap:16px;
+}
+.star{
+  width:54px;height:54px;border-radius:12px;background:#e5ad19;color:#080a0d;
+  display:grid;place-items:center;font-size:28px;
+}
+.premium-head small{color:#e9bb39;font:700 11px Orbitron;letter-spacing:2px}
+.premium h2{margin:4px 0 0;font:800 clamp(20px,2.5vw,31px) Orbitron}
+.premium-price{text-align:right}
+.premium-price small,.premium-price span{display:block;color:#9d8c51;font-size:9px;letter-spacing:2px}
+.premium-price strong{display:block;color:#ffd34b;font:800 clamp(28px,4vw,46px) Orbitron}
+.premium-check{color:#ffd34b}
+
+.premium-content{
+  display:grid;grid-template-columns:1fr 1fr;gap:24px;
+  margin-top:25px;padding-top:22px;border-top:1px solid rgba(235,187,47,.25)
+}
+.include,.exclude{border-radius:12px;padding:20px}
+.include{border:1px solid #2a5b2e;background:rgba(30,90,30,.07)}
+.exclude{border:1px solid #642d2d;background:rgba(100,30,30,.07)}
+.include h3{color:#9eea9c}.exclude h3{color:#ff9d9d}
+.premium-content h3{margin:0;font:800 17px Orbitron}
+.premium-content p{margin:13px 0;color:#71806f;font:600 10px Orbitron;letter-spacing:2px}
+.premium-content ul{padding:0;margin:0;list-style:none}
+.premium-content li{margin:9px 0;color:#aeb4bd;font-size:14px}
+.include li::before{content:"✓";color:#62ec6c;margin-right:9px;font-weight:900}
+.exclude li::before{content:"×";color:#ff6e6e;margin-right:9px;font-weight:900}
+
+.summary{
+  position:sticky;bottom:12px;z-index:20;margin-top:18px;
+  display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:14px;
+  padding:14px 18px;border:1px solid #202a3b;border-radius:15px;
+  background:rgba(13,17,27,.94);backdrop-filter:blur(14px);
+  box-shadow:0 12px 40px rgba(0,0,0,.4)
+}
+.summary-left{display:flex;align-items:center;gap:13px}
+.summary-icon{
+  width:43px;height:43px;border:1px solid #92751e;border-radius:10px;
+  display:grid;place-items:center;color:#f5c52d
+}
+.summary-left small,.summary-total small{display:block;color:#8290a5;font:600 9px Orbitron;letter-spacing:3px}
+.summary-left strong{display:block;font:800 20px Orbitron}
+.summary-total{text-align:right}
+.summary-total strong{display:block;color:#ffd447;font:800 24px Orbitron}
+.summary-btn,.clear-btn{
+  height:43px;border-radius:10px;padding:0 18px;cursor:pointer;
+  background:#121823;color:#8994a8;border:1px solid #273143;font-weight:800
+}
+.clear-btn{color:#ff8181;border-color:#472a31}
+
+.toast{
+  position:fixed;left:50%;bottom:90px;transform:translate(-50%,20px);
+  opacity:0;pointer-events:none;background:#131a26;border:1px solid #33415a;
+  padding:12px 18px;border-radius:10px;transition:.2s;font-weight:700;z-index:50
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media(max-width:1100px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .topbar{grid-template-columns:180px 1fr 130px}
+}
+@media(max-width:700px){
+  .page{width:min(100% - 16px,600px)}
+  .topbar{grid-template-columns:1fr;padding:20px}
+  .brand,.side-brand{display:none}
+  .title h1{font-size:27px}
+  .title p{font-size:8px;letter-spacing:2px}
+  .grid{grid-template-columns:1fr}
+  .premium{padding:18px}
+  .premium-head{grid-template-columns:48px 1fr 24px;gap:10px}
+  .premium-price{grid-column:2;text-align:left}
+  .premium-price strong{font-size:30px}
+  .premium-content{grid-template-columns:1fr}
+  .summary{grid-template-columns:1fr 1fr}
+  .summary-left{grid-column:1 / -1}
+  .summary-total{text-align:left}
+}
+
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">SP<span>M</span></div>
+        <div>
+          <strong>SÃO PAULO</strong>
+          <small>MECÂNICA</small>
+        </div>
+      </div>
+
+      <div class="title">
+        <h1>TABELA DE <span>PREÇOS</span></h1>
+        <p>«« ESCOLHA OS SERVIÇOS PARA SEU VEÍCULO »»</p>
+      </div>
+
+      <div class="side-brand">SÃO PAULO<br><small>MECÂNICA</small></div>
+    </header>
+
+    <section id="categories" class="grid"></section>
+
+    <section class="premium">
+      <div class="premium-head">
+        <div class="star">★</div>
+        <div>
+          <small>★ DESTAQUE ★</small>
+          <h2>PACOTE COMPLETO PREMIUM</h2>
+        </div>
+        <div class="premium-price">
+          <small>APENAS</small>
+          <strong id="premiumPrice">R$ 600K</strong>
+          <span>o melhor custo-benefício</span>
+        </div>
+        <button class="check premium-check" data-package="premium" aria-label="Selecionar pacote premium"></button>
+      </div>
+
+      <div class="premium-content">
+        <div class="include">
+          <h3>✓ O QUE ESTÁ INCLUÍDO</h3>
+          <p>UPGRADE PERFORMANCE &amp; PROTEÇÃO</p>
+          <ul>
+            <li><b>Motor:</b> revisão e melhoria completa.</li>
+            <li><b>Suspensão:</b> estabilidade e controle.</li>
+            <li><b>Freios:</b> sistema de frenagem revisado.</li>
+            <li><b>Transmissão:</b> eficiência e desempenho.</li>
+            <li><b>Proteção:</b> blindagem e revisão geral.</li>
+          </ul>
+        </div>
+
+        <div class="exclude">
+          <h3>× O QUE NÃO ESTÁ INCLUÍDO</h3>
+          <p>ITENS FORA DO PACOTE</p>
+          <ul>
+            <li>Pintura ou envelopamento.</li>
+            <li>Rodas e pneus.</li>
+            <li>Estética interna e acessórios.</li>
+            <li>Faróis ou bodykits.</li>
+            <li>Qualquer serviço não listado acima.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="summary">
+      <div class="summary-left">
+        <div class="summary-icon">♙</div>
+        <div>
+          <small>ITENS SELECIONADOS</small>
+          <strong><span id="selectedCount">0</span> itens</strong>
+        </div>
+      </div>
+
+      <div class="summary-total">
+        <small>TOTAL</small>
+        <strong id="total">R$ 0</strong>
+      </div>
+
+      <button id="summaryBtn" class="summary-btn">VER RESUMO</button>
+      <button id="clearBtn" class="clear-btn">↻ LIMPAR</button>
+    </section>
+
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <script>
+// ============================================================
+// EDITE OS PREÇOS E NOMES AQUI.
+// Você pode mudar os valores sem mexer no HTML.
+// ============================================================
+
+const categories = [
+  {
+    id: "motor",
+    title: "MECÂNICA",
+    subtitle: "REVISÕES E PERFORMANCE",
+    color: "cyan",
+    items: [
+      ["motor", "REVISÃO DO MOTOR", 150000, "⚙"],
+      ["freio", "SISTEMA DE FREIO", 150000, "◉"],
+      ["susp", "SUSPENSÃO", 150000, "✥"],
+      ["turbo", "MELHORIA DO TURBO", 150000, "➜"],
+      ["blind", "BLINDAGEM", 150000, "♢"]
+    ],
+    packages: [
+      ["pack1", "PACOTE MECÂNICA COMPLETO", 500000],
+      ["pack2", "PACOTE COMPLETO + BLINDAGEM", 600000]
+    ]
+  },
+  {
+    id: "reparo",
+    title: "REPARO",
+    subtitle: "MANUTENÇÕES E REPAROS",
+    color: "orange",
+    items: [
+      ["interno", "INTERNO", 30000, "▣"],
+      ["externo", "EXTERNO", 50000, "⌁"],
+      ["kit3", "KIT REPARO (3 USOS)", 50000, "▣"],
+      ["parceria", "KIT REPARO — COM PARCERIA", 30000, "◇"],
+      ["semparceria", "KIT REPARO — SEM PARCERIA", 50000, "⊗"],
+      ["pneu", "PNEU", 5000, "○"],
+      ["pneuparceria", "PNEU — COM PARCERIA", 2500, "◇"]
+    ]
+  },
+  {
+    id: "custom",
+    title: "CUSTOMIZAÇÃO",
+    subtitle: "E APARÊNCIA",
+    color: "pink",
+    items: [
+      ["pintura", "PINTURA", 25000, "✎"],
+      ["placa", "COR PRA PLACA", 25000, "✿"],
+      ["secundaria", "COR SECUNDÁRIA", 25000, "✿"],
+      ["perolado", "PEROLADO", 25000, "✦"],
+      ["vidro", "VIDRO", 25000, "□"],
+      ["buzina", "BUZINA", 25000, "◖"],
+      ["capo", "CAPÔ", 25000, "⌁"],
+      ["grade", "GRADE", 25000, "▦"],
+      ["xenon", "XENON", 50000, "♧"],
+      ["neon", "NEON (SOB O CARRO)", 150000, "ϟ"]
+    ],
+    common: true
+  },
+  {
+    id: "extras",
+    title: "EXTRAS",
+    subtitle: "OUTRAS MODIFICAÇÕES",
+    color: "green",
+    items: [
+      ["turbo2", "MELHORIA DE TURBO", 400000, "≋"],
+      ["blind2", "BLINDAGEM", 25000, "♢"],
+      ["pintura2", "PINTURA", 25000, "✎"],
+      ["cor", "COR", 25000, "◉"],
+      ["interior", "INTERIOR", 25000, "▣"],
+      ["som", "SOM", 25000, "◖"],
+      ["luzes", "LUZES", 25000, "♧"],
+      ["performance", "PERFORMANCE", 25000, "ϟ"]
+    ],
+    packages: [
+      ["heli", "PACOTE COMPLETO HELI", 800000]
+    ],
+    common: true
+  }
+];
+
+const PREMIUM = 600000;
+const state = { selected: new Map(), premium: false };
+
+const money = value => {
+  const k = value / 1000;
+  return `R$ ${Number.isInteger(k) ? k.toLocaleString("pt-BR") : k.toLocaleString("pt-BR",{maximumFractionDigits:1})}K`;
+};
+
+function render() {
+  const root = document.querySelector("#categories");
+  root.innerHTML = categories.map(cat => `
+    <article class="card ${cat.color}">
+      <div class="card-title">
+        <h2>${cat.title}</h2>
+        <p>${cat.subtitle}</p>
+      </div>
+
+      ${cat.items.map(item => itemHTML(cat, item)).join("")}
+
+      ${cat.packages ? `
+        <div class="section-label">« PACOTES ${cat.id === "extras" ? "EXTRAS" : ""} »</div>
+        ${cat.packages.map(p => `
+          <div class="item">
+            <div class="icon">${cat.id === "extras" ? "✦" : "♙"}</div>
+            <div class="name">${p[1]}</div>
+            <div class="price">${money(p[2])}</div>
+            <button class="check" data-id="${p[0]}" data-price="${p[2]}" aria-label="Selecionar ${p[1]}"></button>
+          </div>
+        `).join("")}
+      ` : ""}
+
+      ${cat.common ? `
+        <div class="section-label">« ITENS COMUNS EXTRAS »</div>
+        <div class="item">
+          <div class="icon">+</div>
+          <div>
+            <div class="name">ITEM COMUM</div>
+            <div style="font-size:9px;color:#6f7b90">R$ 25K CADA</div>
+          </div>
+          <div class="counter" style="grid-column:3 / 5;color:inherit">
+            <button data-common="-">−</button>
+            <div class="qty" id="common-${cat.id}">0</div>
+            <button data-common="+">+</button>
+          </div>
+        </div>
+      ` : ""}
+    </article>
+  `).join("");
+
+  document.querySelector("#premiumPrice").textContent = money(PREMIUM);
+  bind();
+  update();
+}
+
+function itemHTML(cat, item) {
+  return `
+    <div class="item">
+      <div class="icon">${item[3]}</div>
+      <div class="name">${item[1]}</div>
+      <div class="price">${money(item[2])}</div>
+      <button class="check" data-id="${item[0]}" data-price="${item[2]}" aria-label="Selecionar ${item[1]}"></button>
+    </div>
+  `;
+}
+
+function bind() {
+  document.querySelectorAll(".check:not(.premium-check)").forEach(btn => {
+    btn.addEventListener("click", () => toggle(btn.dataset.id, Number(btn.dataset.price), btn));
+  });
+
+  document.querySelector(".premium-check").addEventListener("click", e => {
+    state.premium = !state.premium;
+    e.currentTarget.classList.toggle("selected", state.premium);
+    update();
+  });
+
+  document.querySelectorAll("[data-common]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const card = btn.closest(".card");
+      const id = "common-" + card.querySelector(".card-title h2").textContent.toLowerCase();
+      const current = state.selected.get(id)?.qty || 0;
+      const next = btn.dataset.common === "+" ? current + 1 : Math.max(0, current - 1);
+      if (next === 0) state.selected.delete(id);
+      else state.selected.set(id, { price: 25000, qty: next, name: "ITEM COMUM" });
+      card.querySelector(".qty").textContent = next;
+      update();
+    });
+  });
+}
+
+function toggle(id, price, btn) {
+  if (state.selected.has(id)) state.selected.delete(id);
+  else state.selected.set(id, { price, qty: 1, name: btn.closest(".item").querySelector(".name").textContent });
+  btn.classList.toggle("selected", state.selected.has(id));
+  update();
+}
+
+function update() {
+  let total = state.premium ? PREMIUM : 0;
+  let count = state.premium ? 1 : 0;
+
+  state.selected.forEach(v => {
+    total += v.price * v.qty;
+    count += v.qty;
+  });
+
+  document.querySelector("#total").textContent = money(total);
+  document.querySelector("#selectedCount").textContent = count;
+}
+
+document.querySelector("#clearBtn").addEventListener("click", () => {
+  state.selected.clear();
+  state.premium = false;
+  render();
+  toast("Seleção limpa.");
+});
+
+document.querySelector("#summaryBtn").addEventListener("click", () => {
+  const lines = [];
+  if (state.premium) lines.push(`• Pacote Completo Premium — ${money(PREMIUM)}`);
+  state.selected.forEach(v => {
+    lines.push(`• ${v.name}${v.qty > 1 ? ` x${v.qty}` : ""} — ${money(v.price * v.qty)}`);
+  });
+
+  toast(lines.length ? lines.join(" | ") : "Nenhum item selecionado.");
+});
+
+function toast(message) {
+  const el = document.querySelector("#toast");
+  el.textContent = message;
+  el.classList.add("show");
+  clearTimeout(window.__toast);
+  window.__toast = setTimeout(() => el.classList.remove("show"), 3200);
+}
+
+render();
+
+  </script>
+</body>
+</html>
